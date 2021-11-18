@@ -1,7 +1,10 @@
 package com.minimaldev.android.jetpackchatapp
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -21,11 +24,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.minimaldev.android.jetpackchatapp.MainActivity.Companion.TAG
+import com.minimaldev.android.jetpackchatapp.MainActivity.Companion.auth
+import com.minimaldev.android.jetpackchatapp.MainActivity.Companion.context
 import com.minimaldev.android.jetpackchatapp.ui.theme.JetpackChatAppTheme
 
 class MainActivity : ComponentActivity() {
+    companion object {
+        lateinit var auth: FirebaseAuth
+        val TAG: String = "MainActivity"
+        lateinit var context: Context
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = Firebase.auth
+        context = this
         setContent {
             JetpackChatAppTheme {
                 SignInScreen()
@@ -36,7 +53,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SignInScreen() {
-    var username by remember { mutableStateOf("") }
+    var emailId by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
     Column(
@@ -59,9 +76,9 @@ fun SignInScreen() {
                 .height(16.dp)
         )
         OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Username") },
+            value = emailId,
+            onValueChange = { emailId = it },
+            label = { Text("Email ID") },
             textStyle = TextStyle(
                 color = colorResource(id = R.color.white),
                 fontSize = 16.sp
@@ -102,7 +119,7 @@ fun SignInScreen() {
                 .height(16.dp)
         )
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { signIn(emailId, password) },
             modifier = Modifier.padding(12.dp),
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.textButtonColors(
@@ -133,6 +150,19 @@ fun SignInScreen() {
             fontWeight = FontWeight.Bold
         )
     }
+}
+
+private fun signIn(email: String, password: String) {
+    auth.signInWithEmailAndPassword(email, password)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val user = auth.currentUser
+                Log.e(TAG, "signInWithEmail:success user-> " + user)
+            } else {
+                Log.e(TAG, "signInWithEmail:failure", task.exception)
+                Toast.makeText(context, "Authentication failed.", Toast.LENGTH_SHORT).show()
+            }
+        }
 }
 
 @Preview(showBackground = true)

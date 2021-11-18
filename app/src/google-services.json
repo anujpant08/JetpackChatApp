@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "54359974115",
+    "project_id": "jetchat-2faf4",
+    "storage_bucket": "jetchat-2faf4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:54359974115:android:b37018462eb7a0784ea5d6",
+        "android_client_info": {
+          "package_name": "com.minimaldev.android.jetpackchatapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "54359974115-s2q9qsc605u1ijnqprjpv9tou2okfmfs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7xiZJ0T1Hc_MXvlmIQAls0Pzv8OyyT60"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "54359974115-s2q9qsc605u1ijnqprjpv9tou2okfmfs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
