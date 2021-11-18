@@ -1,5 +1,6 @@
 package com.minimaldev.android.jetpackchatapp
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -123,8 +124,7 @@ fun SignInScreen() {
             text = "Not a user? Sign up here.",
             modifier = Modifier.clickable(
                 onClick = {
-
-
+                    context.startActivity(Intent(context, SignUpActivity::class.java))
                 }
             ),
             color = colorResource(id = R.color.purple_200_dark),
