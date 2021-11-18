@@ -55,12 +55,12 @@ class SignUpActivity : AppCompatActivity() {
     }
     @Composable
     fun SignUpScreen(){
-        var firstName by remember { mutableStateOf("") }
-        var lastName by remember { mutableStateOf("") }
-        var username by remember { mutableStateOf("") }
-        var emailId by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
-        var confirmPassword by remember { mutableStateOf("") }
+        var firstName : String by remember { mutableStateOf("") }
+        var lastName : String by remember { mutableStateOf("") }
+        var username : String by remember { mutableStateOf("") }
+        var emailId : String by remember { mutableStateOf("") }
+        var password : String by remember { mutableStateOf("") }
+        var confirmPassword : String by remember { mutableStateOf("") }
         val context = LocalContext.current
         Column(
             modifier = Modifier
@@ -210,7 +210,23 @@ class SignUpActivity : AppCompatActivity() {
                     .height(8.dp)
             )
             Button(
-                onClick = { createAccount(emailId, password) },
+                onClick = {
+                    if (password == confirmPassword
+                        && emailId.contains(regex = Regex(pattern = "@\\w+\\.\\w{2,3}"))
+                        && firstName.trim() != ""
+                        && lastName.trim() != ""
+                        && username.trim() != ""
+                        && password.trim() != ""
+                    ) {
+                        createAccount(emailId, password)
+                    }else if(!emailId.contains(regex = Regex(pattern = "@\\w+\\.\\w{2,3}"))){
+                        Toast.makeText(baseContext, "Please enter a valid email address.", Toast.LENGTH_SHORT).show()
+                    }else if(password != confirmPassword){
+                        Toast.makeText(baseContext, "Password and Confirm Password don't match.", Toast.LENGTH_SHORT).show()
+                    }else{
+                        Toast.makeText(baseContext, "Please fill all the fields.", Toast.LENGTH_SHORT).show()
+                    }
+                },
                 modifier = Modifier.padding(12.dp),
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.textButtonColors(
