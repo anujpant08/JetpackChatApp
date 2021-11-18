@@ -2,6 +2,8 @@ package com.minimaldev.android.jetpackchatapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,18 +21,38 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.minimaldev.android.jetpackchatapp.ui.theme.JetpackChatAppTheme
 
 class SignUpActivity : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth
+    val TAG : String = "SignUpActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
+        /*setContent {
             JetpackChatAppTheme {
                 SignUpScreen()
             }
-        }
+        }*/
+        auth = Firebase.auth
     }
 
+    override fun onStart() {
+        super.onStart()
+        val currentUser = auth.currentUser
+        if(currentUser != null){
+            //Login directly into the app
+        }else{
+            //Display login page
+            setContent {
+                JetpackChatAppTheme {
+                    SignUpScreen()
+                }
+            }
+        }
+    }
     @Composable
     fun SignUpScreen(){
         var firstName by remember { mutableStateOf("") }
@@ -188,7 +210,7 @@ class SignUpActivity : AppCompatActivity() {
                     .height(8.dp)
             )
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { createAccount(emailId, password) },
                 modifier = Modifier.padding(12.dp),
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.textButtonColors(
@@ -202,6 +224,24 @@ class SignUpActivity : AppCompatActivity() {
                 )
             }
         }
+    }
+
+    private fun createAccount(email: String, password: String){
+        Log.e(TAG, "email: $email password: $password")
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.e(TAG, "createUserWithEmail:success")
+                    val user = auth.currentUser
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.e(TAG, "createUserWithEmail:failure", task.exception)
+                    Toast.makeText(baseContext, "Authentication failed.",
+                        Toast.LENGTH_SHORT).show()
+
+                }
+            }
     }
 
     @Preview(showBackground = true)
