@@ -24,15 +24,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.ActionCodeSettings
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.minimaldev.android.jetpackchatapp.MainActivity.Companion.TAG
-import com.minimaldev.android.jetpackchatapp.MainActivity.Companion.auth
-import com.minimaldev.android.jetpackchatapp.MainActivity.Companion.context
+import com.minimaldev.android.jetpackchatapp.LoginActivity.Companion.TAG
+import com.minimaldev.android.jetpackchatapp.LoginActivity.Companion.auth
+import com.minimaldev.android.jetpackchatapp.LoginActivity.Companion.context
 import com.minimaldev.android.jetpackchatapp.ui.theme.JetpackChatAppTheme
 
-class MainActivity : ComponentActivity() {
+class LoginActivity : ComponentActivity() {
     companion object {
         lateinit var auth: FirebaseAuth
         val TAG: String = "MainActivity"
@@ -43,9 +44,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
         context = this
-        setContent {
-            JetpackChatAppTheme {
-                SignInScreen()
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            //Show homepage.
+            context.startActivity(Intent(context, HomePageActivity::class.java))
+        } else {
+            setContent {
+                JetpackChatAppTheme {
+                    SignInScreen()
+                }
             }
         }
     }
@@ -53,8 +60,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SignInScreen() {
-    var emailId by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var emailId: String by remember { mutableStateOf("") }
+    var password: String by remember { mutableStateOf("") }
     val context = LocalContext.current
     Column(
         modifier = Modifier
@@ -119,7 +126,17 @@ fun SignInScreen() {
                 .height(16.dp)
         )
         Button(
-            onClick = { signIn(emailId, password) },
+            onClick = {
+                if (emailId.trim() != "" && password.trim() != "") {
+                    signIn(emailId, password)
+                } else {
+                    Toast.makeText(
+                        LoginActivity.context,
+                        "Please enter all the details.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            },
             modifier = Modifier.padding(12.dp),
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.textButtonColors(
@@ -149,6 +166,25 @@ fun SignInScreen() {
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold
         )
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth(1f)
+                .height(8.dp)
+        )
+        Text(
+            text = "Forgot your password?",
+            modifier = Modifier.clickable(
+                onClick = {
+                    //TODO:Add a reset password screen.
+                    // 1. Send token to email address - use Java Mail API.
+                    // 2. Verify token in next screen and reset password for the user.
+                }
+            ),
+            color = colorResource(id = R.color.purple_200_dark),
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
@@ -160,7 +196,11 @@ private fun signIn(email: String, password: String) {
                 Log.e(TAG, "signInWithEmail:success user-> " + user)
             } else {
                 Log.e(TAG, "signInWithEmail:failure", task.exception)
-                Toast.makeText(context, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    "Authentication failed. Please check the email id/password.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 }
