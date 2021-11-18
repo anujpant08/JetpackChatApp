@@ -1,5 +1,6 @@
 package com.minimaldev.android.jetpackchatapp
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -250,6 +251,7 @@ class SignUpActivity : AppCompatActivity() {
                     // Sign in success, update UI with the signed-in user's information
                     Log.e(TAG, "createUserWithEmail:success")
                     val user = auth.currentUser
+                    this.startActivity(Intent(this, HomePageActivity::class.java))
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.e(TAG, "createUserWithEmail:failure", task.exception)
