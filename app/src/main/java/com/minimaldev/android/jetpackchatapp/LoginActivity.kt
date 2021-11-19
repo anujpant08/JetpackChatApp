@@ -41,18 +41,23 @@ class LoginActivity : ComponentActivity() {
     companion object {
         lateinit var auth: FirebaseAuth
         val TAG: String = "MainActivity"
+
         @SuppressLint("StaticFieldLeak")
         lateinit var context: Context
-        val sendMail : SendMail = SendMail()
-        fun updateUI(success: Boolean, message : String, emailId : String){
+        val sendMail: SendMail = SendMail()
+        fun updateUI(success: Boolean, message: String, emailId: String, code: String) {
             Log.e(TAG, "Got the message: " + message)
-            if(success){
+            if (success) {
                 //Start new activity to enter verification code.
-            }else{
+                var intent: Intent = Intent(context, VerifyCodeActivity::class.java)
+                intent.putExtra("verifyCode", code)
+                context.startActivity(intent)
+            } else {
                 //Show error message
             }
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
@@ -188,14 +193,22 @@ fun SignInScreen() {
             text = "Forgot your password?",
             modifier = Modifier.clickable(
                 onClick = {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        sendMail.send(emailId, "1234", context)
+                    if (emailId.trim() != "" && emailId.contains(Regex(""))) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            sendMail.send(emailId, "1234", context)
+                        }
+                        Toast.makeText(
+                            LoginActivity.context,
+                            "Sending password verification code to $emailId",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }else{
+                        Toast.makeText(
+                            LoginActivity.context,
+                            "Please enter a valid email address.",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
-                    Toast.makeText(
-                        LoginActivity.context,
-                        "Sending password verification code to $emailId",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
             ),
             color = colorResource(id = R.color.purple_200_dark),

@@ -26,7 +26,7 @@ class SendMail() : Authenticator(), TransportListener, ConnectionListener{
     private lateinit var code : String
     private lateinit var context: Context
     private var toAddress : String = ""
-    private val fromAddress = ""
+    private val fromAddress = "minimaldev4playstore@gmail.com"
     suspend fun send(toAddress : String, code : String, context : Context) {
         this.context = context
         this.toAddress = toAddress
@@ -61,22 +61,22 @@ class SendMail() : Authenticator(), TransportListener, ConnectionListener{
         Log.e(TAG, "Sending mail to: " + toAddress)
     }
     override fun getPasswordAuthentication(): PasswordAuthentication {
-        return PasswordAuthentication(fromAddress, "")
+        return PasswordAuthentication(fromAddress, "chelsea997")
     }
 
     override fun messageDelivered(e: TransportEvent?) {
         Log.e(TAG,"Message delivered.")
-        LoginActivity.updateUI(true, "Delivered", this.toAddress)
+        LoginActivity.updateUI(true, "Delivered", this.toAddress, this.code)
     }
 
     override fun messageNotDelivered(e: TransportEvent?) {
         Log.e(TAG,"Message NOT delivered.")
-        LoginActivity.updateUI(false, "Not Delivered", this.toAddress)
+        LoginActivity.updateUI(false, "Not Delivered", this.toAddress, this.code)
     }
 
     override fun messagePartiallyDelivered(e: TransportEvent?) {
         Log.e(TAG,"Message PARTIALLY delivered.")
-        LoginActivity.updateUI(false, "Partially Delivered", this.toAddress)
+        LoginActivity.updateUI(false, "Partially Delivered", this.toAddress, this.code)
     }
 
     override fun opened(e: ConnectionEvent?) {

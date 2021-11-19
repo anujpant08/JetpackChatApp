@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.JetpackChatApp">
         <activity
+            android:name=".VerifyCodeActivity"
+            android:exported="false" />
+        <activity
             android:name=".HomePageActivity"
             android:exported="false" />
         <activity
