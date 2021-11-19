@@ -1,5 +1,6 @@
 package com.minimaldev.android.jetpackchatapp
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -24,22 +25,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.firebase.auth.ActionCodeSettings
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.minimaldev.android.jetpackchatapp.LoginActivity.Companion.TAG
 import com.minimaldev.android.jetpackchatapp.LoginActivity.Companion.auth
 import com.minimaldev.android.jetpackchatapp.LoginActivity.Companion.context
+import com.minimaldev.android.jetpackchatapp.LoginActivity.Companion.sendMail
 import com.minimaldev.android.jetpackchatapp.ui.theme.JetpackChatAppTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LoginActivity : ComponentActivity() {
     companion object {
         lateinit var auth: FirebaseAuth
         val TAG: String = "MainActivity"
+        @SuppressLint("StaticFieldLeak")
         lateinit var context: Context
+        val sendMail : SendMail = SendMail()
+        fun updateUI(success: Boolean, message : String, emailId : String){
+            Log.e(TAG, "Got the message: " + message)
+            if(success){
+                //Start new activity to enter verification code.
+            }else{
+                //Show error message
+            }
+        }
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
@@ -175,9 +188,14 @@ fun SignInScreen() {
             text = "Forgot your password?",
             modifier = Modifier.clickable(
                 onClick = {
-                    //TODO:Add a reset password screen.
-                    // 1. Send token to email address - use Java Mail API.
-                    // 2. Verify token in next screen and reset password for the user.
+                    CoroutineScope(Dispatchers.IO).launch {
+                        sendMail.send(emailId, "1234", context)
+                    }
+                    Toast.makeText(
+                        LoginActivity.context,
+                        "Sending password verification code to $emailId",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             ),
             color = colorResource(id = R.color.purple_200_dark),
