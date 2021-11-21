@@ -127,7 +127,7 @@ class VerifyCodeActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
             // TODO: For testing purpose:
-            //this.startActivity(Intent(this, WelcomeJetpackActivity::class.java))
+            this.startActivity(Intent(this, WelcomeJetpackActivity::class.java))
         }else{
             Toast.makeText(
                 this,
