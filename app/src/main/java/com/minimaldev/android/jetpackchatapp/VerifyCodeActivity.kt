@@ -1,5 +1,6 @@
 package com.minimaldev.android.jetpackchatapp
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -125,6 +126,8 @@ class VerifyCodeActivity : AppCompatActivity() {
                 "Verification successful.",
                 Toast.LENGTH_SHORT
             ).show()
+            // TODO: For testing purpose:
+            //this.startActivity(Intent(this, WelcomeJetpackActivity::class.java))
         }else{
             Toast.makeText(
                 this,
