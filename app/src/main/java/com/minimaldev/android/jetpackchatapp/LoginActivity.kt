@@ -36,6 +36,8 @@ import com.minimaldev.android.jetpackchatapp.ui.theme.JetpackChatAppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.math.BigInteger
+import java.security.SecureRandom
 
 class LoginActivity : ComponentActivity() {
     companion object {
@@ -194,8 +196,10 @@ fun SignInScreen() {
             modifier = Modifier.clickable(
                 onClick = {
                     if (emailId.trim() != "" && emailId.contains(Regex(""))) {
+                        val random = SecureRandom() // Using SHA1PRNG algorithm technique.
+                        val randomCode: String = BigInteger(30, random).toString(32).uppercase()
                         CoroutineScope(Dispatchers.IO).launch {
-                            sendMail.send(emailId, "1234", context)
+                            sendMail.send(emailId, randomCode, context)
                         }
                         Toast.makeText(
                             LoginActivity.context,
