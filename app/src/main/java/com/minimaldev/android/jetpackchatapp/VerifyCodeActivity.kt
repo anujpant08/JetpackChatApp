@@ -25,10 +25,12 @@ import com.minimaldev.android.jetpackchatapp.ui.theme.JetpackChatAppTheme
 
 class VerifyCodeActivity : AppCompatActivity() {
     private var verifyCode : String = ""
+    private var emailId : String = ""
     private val TAG : String = "VerifyCodeActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         verifyCode = intent.getStringExtra("verifyCode").toString()
+        emailId = intent.getStringExtra("emailId").toString()
         Log.e(TAG, "verify code is:  " + verifyCode)
         setContent {
             JetpackChatAppTheme {
@@ -127,7 +129,9 @@ class VerifyCodeActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
             // TODO: For testing purpose:
-            this.startActivity(Intent(this, WelcomeJetpackActivity::class.java))
+            val intent: Intent = Intent(this, ResetPasswordActivity::class.java)
+            intent.putExtra("emailId", emailId)
+            this.startActivity(intent)
         }else{
             Toast.makeText(
                 this,
