@@ -51,8 +51,9 @@ class LoginActivity : ComponentActivity() {
             Log.e(TAG, "Got the message: " + message)
             if (success) {
                 //Start new activity to enter verification code.
-                var intent: Intent = Intent(context, VerifyCodeActivity::class.java)
+                val intent: Intent = Intent(context, VerifyCodeActivity::class.java)
                 intent.putExtra("verifyCode", code)
+                intent.putExtra("emailId", emailId)
                 context.startActivity(intent)
             } else {
                 //Show error message

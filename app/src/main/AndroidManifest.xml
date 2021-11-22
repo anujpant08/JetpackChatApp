@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.JetpackChatApp">
         <activity
+            android:name=".ResetPasswordActivity"
+            android:exported="false" />
+        <activity
             android:name=".WelcomeJetpackActivity"
             android:exported="false" />
         <activity
