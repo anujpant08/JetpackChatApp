@@ -42,8 +42,7 @@ import java.security.SecureRandom
 class LoginActivity : ComponentActivity() {
     companion object {
         lateinit var auth: FirebaseAuth
-        val TAG: String = "MainActivity"
-
+        val TAG: String = "LoginActivity"
         @SuppressLint("StaticFieldLeak")
         lateinit var context: Context
         val sendMail: SendMail = SendMail()
@@ -68,7 +67,7 @@ class LoginActivity : ComponentActivity() {
         val currentUser = auth.currentUser
         if (currentUser != null) {
             //Show homepage.
-            context.startActivity(Intent(context, HomePageActivity::class.java))
+            context.startActivity(Intent(context, WelcomeJetpackActivity::class.java))
         } else {
             setContent {
                 JetpackChatAppTheme {
@@ -230,6 +229,7 @@ private fun signIn(email: String, password: String) {
             if (task.isSuccessful) {
                 val user = auth.currentUser
                 Log.e(TAG, "signInWithEmail:success user-> " + user)
+                context.startActivity(Intent(context, WelcomeJetpackActivity::class.java))
             } else {
                 Log.e(TAG, "signInWithEmail:failure", task.exception)
                 Toast.makeText(

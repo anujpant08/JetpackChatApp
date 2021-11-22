@@ -1,5 +1,6 @@
 package com.minimaldev.android.jetpackchatapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
 import androidx.activity.compose.setContent
@@ -48,6 +49,7 @@ class WelcomeJetpackActivity  : AppCompatActivity(){
     }
     @Composable
     fun SetJetPackLayout(){
+        val context = LocalContext.current
         val painter = rememberImagePainter(
             data = AppCompatResources.getDrawable(this,R.drawable.jetchat_background),
             builder = {
@@ -112,7 +114,9 @@ class WelcomeJetpackActivity  : AppCompatActivity(){
                             .height(8.dp)
                     )
                     TextButton(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                                  context.startActivity(Intent(context, CreateRoomActivity::class.java))
+                        },
                         modifier = Modifier.padding(16.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.textButtonColors(
