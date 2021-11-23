@@ -11,6 +11,7 @@ import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +19,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -35,11 +37,12 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.minimaldev.android.jetpackchatapp.model.MessageText
 import com.minimaldev.android.jetpackchatapp.ui.theme.JetpackChatAppTheme
+import kotlinx.coroutines.launch
 import java.time.Instant.now
 import java.util.*
 
 class HomePageActivity : AppCompatActivity() {
-    var messages : MutableList<MessageText> = mutableListOf()
+    var messages : SnapshotStateList<MessageText> = mutableStateListOf()
     private lateinit var auth: FirebaseAuth
     lateinit var roomName : String
     val TAG : String = "HomePageActivity"
@@ -62,6 +65,8 @@ class HomePageActivity : AppCompatActivity() {
     @Composable
     fun HomePageScreen(){
         var newMessage : String by remember { mutableStateOf("") }
+        val listState = rememberLazyListState()
+        val coroutineScope = rememberCoroutineScope()
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -84,14 +89,16 @@ class HomePageActivity : AppCompatActivity() {
             }
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxWidth(1.5f)
+                    .fillMaxWidth(1f)
                     .weight(2.3f, true),
                 contentPadding = PaddingValues(8.dp),
+                state = listState
             ){
                 items(
                     items = messages
                 ){
                     message -> MessageBubble(messageText = message)
+
                 }
             }
             Row(
@@ -122,7 +129,12 @@ class HomePageActivity : AppCompatActivity() {
                     if(newMessage.trim() != ""){
                         val messageText = MessageText(text = newMessage, name = auth.currentUser?.displayName.toString(), date = Date())
                         db.reference.child("messages").child(roomName).push().setValue(messageText)
-                        // TODO: Refresh LazyColumn items with new messages after sending them.
+                        messages.add(messageText)
+                        // TODO: Scroll to bottom after new message is sent
+                        coroutineScope.launch {
+                            listState.animateScrollToItem(listState.layoutInfo.totalItemsCount - 1)
+                        }
+                        newMessage = ""
                     }
                 }) {
                     Icon(
@@ -142,7 +154,7 @@ class HomePageActivity : AppCompatActivity() {
         var messageText2 = MessageText("Hello!", "John", Date())
         var messageText3 = MessageText("How are you ?", "Kevin", Date())
         var messageText4 = MessageText("I am good, thanks!", "John", Date())
-        var messageText5 = MessageText("Great!", "Amy", Date())
+        var messageText5 = MessageText("sdfhsifsiuhdfshufisfsfsydfsdusdufhshufsfhshufsuhfsfsuihfsfsdhfsdhfsiufsifshjfsduifsdfsfkhsfhisfyijhkfsihfsdfiusdf", "Amy", Date())
         this.messages.add(messageText1)
         this.messages.add(messageText2)
         this.messages.add(messageText3)
