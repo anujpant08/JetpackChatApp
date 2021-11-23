@@ -130,7 +130,6 @@ class HomePageActivity : AppCompatActivity() {
                         val messageText = MessageText(text = newMessage, name = auth.currentUser?.displayName.toString(), date = Date())
                         db.reference.child("messages").child(roomName).push().setValue(messageText)
                         messages.add(messageText)
-                        // TODO: Scroll to bottom after new message is sent
                         coroutineScope.launch {
                             listState.animateScrollToItem(listState.layoutInfo.totalItemsCount - 1)
                         }
