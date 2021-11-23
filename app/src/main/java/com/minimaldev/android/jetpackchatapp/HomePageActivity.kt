@@ -3,6 +3,7 @@ package com.minimaldev.android.jetpackchatapp
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,6 +28,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.minimaldev.android.jetpackchatapp.model.MessageText
 import com.minimaldev.android.jetpackchatapp.ui.theme.JetpackChatAppTheme
 import java.time.Instant.now
@@ -34,14 +40,19 @@ import java.util.*
 
 class HomePageActivity : AppCompatActivity() {
     var messages : MutableList<MessageText> = mutableListOf()
+    private lateinit var auth: FirebaseAuth
     lateinit var roomName : String
+    val TAG : String = "HomePageActivity"
+    private lateinit var db: FirebaseDatabase
     /*fun HomePageActivity(messages : MutableList<MessageText>){
         this.messages = messages
     }*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         roomName = intent.getStringExtra("roomName").toString()
+        db = Firebase.database
         createDummyMessages()
+        auth = Firebase.auth
         setContent {
             JetpackChatAppTheme {
                 HomePageScreen()
@@ -107,8 +118,12 @@ class HomePageActivity : AppCompatActivity() {
                     ),
                 )
                 IconButton(onClick = {
-                    //TODO: Send message and update in Firebase.
-
+                    Log.e(TAG, "New message is: " + newMessage.trim())
+                    if(newMessage.trim() != ""){
+                        val messageText = MessageText(text = newMessage, name = auth.currentUser?.displayName.toString(), date = Date())
+                        db.reference.child("messages").child(roomName).push().setValue(messageText)
+                        // TODO: Refresh LazyColumn items with new messages after sending them.
+                    }
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.send),

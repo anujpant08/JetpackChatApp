@@ -1,6 +1,5 @@
 package com.minimaldev.android.jetpackchatapp
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -24,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
 import com.minimaldev.android.jetpackchatapp.ui.theme.JetpackChatAppTheme
 
@@ -219,7 +219,7 @@ class SignUpActivity : AppCompatActivity() {
                         && username.trim() != ""
                         && password.trim() != ""
                     ) {
-                        createAccount(emailId, password)
+                        createAccount(emailId, password, username)
                     }else if(!emailId.contains(regex = Regex(pattern = "@\\w+\\.\\w{2,3}"))){
                         Toast.makeText(baseContext, "Please enter a valid email address.", Toast.LENGTH_SHORT).show()
                     }else if(password != confirmPassword){
@@ -243,7 +243,7 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    private fun createAccount(email: String, password: String){
+    private fun createAccount(email: String, password: String, username : String){
         Log.e(TAG, "email: $email password: $password")
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
@@ -251,7 +251,15 @@ class SignUpActivity : AppCompatActivity() {
                     // Sign in success, update UI with the signed-in user's information
                     Log.e(TAG, "createUserWithEmail:success")
                     val user = auth.currentUser
-                    
+                    val profileUpdates = userProfileChangeRequest {
+                        displayName = username
+                    }
+                    user!!.updateProfile(profileUpdates)
+                        .addOnCompleteListener { updateTask ->
+                            if (updateTask.isSuccessful) {
+                                Log.e(TAG, "User profile updated with username: " + user.displayName)
+                            }
+                        }
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.e(TAG, "createUserWithEmail:failure", task.exception)
