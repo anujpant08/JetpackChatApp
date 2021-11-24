@@ -58,6 +58,7 @@ class HomePageActivity : AppCompatActivity() {
         val messageRef = db.reference.child("messages").child(roomName)
         val valueEventListener = object : ValueEventListener{
             override fun onDataChange(dataSnapshot: DataSnapshot) {
+                //totalMessages = 0
                 messages.clear()
                 for(snapshot in dataSnapshot.children){
                     //Log.e(TAG, "Message from DB: $snapshot.value")
@@ -121,12 +122,11 @@ class HomePageActivity : AppCompatActivity() {
                         items = messages
                     ){
                             message -> MessageBubble(messageText = message)
-                        // TODO: If any other way to use coroutines to scroll to bottom on item update/added.
                         // Scrolling to bottom using coroutine thread whenever a new message is received.
                         // TODO: Use floating button to show new messages instead of scrolling to bottom
                         coroutineScope.launch {
                             if(listState.layoutInfo.totalItemsCount != totalMessages){
-                                if(totalMessages == 0){
+                                if(totalMessages == 0 || listState.firstVisibleItemIndex > listState.layoutInfo.totalItemsCount/2){
                                     listState.animateScrollToItem(listState.layoutInfo.totalItemsCount - 1)
                                 }
                                 totalMessages = listState.layoutInfo.totalItemsCount
@@ -192,6 +192,7 @@ class HomePageActivity : AppCompatActivity() {
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
+                totalMessages = listState.layoutInfo.totalItemsCount
                 ScrollToBottomButton(coroutineScope, listState)
             }
         }
