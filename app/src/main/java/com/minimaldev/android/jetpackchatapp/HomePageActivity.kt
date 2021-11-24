@@ -1,5 +1,6 @@
 package com.minimaldev.android.jetpackchatapp
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -30,16 +31,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import com.minimaldev.android.jetpackchatapp.model.MessageText
 import com.minimaldev.android.jetpackchatapp.ui.theme.JetpackChatAppTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.Instant.now
 import java.util.*
+import kotlin.collections.HashMap
 
 class HomePageActivity : AppCompatActivity() {
     var messages : SnapshotStateList<MessageText> = mutableStateListOf()
@@ -47,6 +56,7 @@ class HomePageActivity : AppCompatActivity() {
     lateinit var roomName : String
     val TAG : String = "HomePageActivity"
     private lateinit var db: FirebaseDatabase
+    private var totalMessages = 0
     /*fun HomePageActivity(messages : MutableList<MessageText>){
         this.messages = messages
     }*/
@@ -54,7 +64,26 @@ class HomePageActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         roomName = intent.getStringExtra("roomName").toString()
         db = Firebase.database
-        createDummyMessages()
+        //createDummyMessages()
+        val messageRef = db.reference.child("messages").child(roomName)
+        val valueEventListener = object : ValueEventListener{
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                messages.clear()
+                for(snapshot in dataSnapshot.children){
+                    //Log.e(TAG, "Message from DB: $snapshot.value")
+                    val map : HashMap<String, Any> = snapshot.value!! as HashMap<String, Any>
+                    Log.e(TAG, "map: $map")
+                    val newMsg = MessageText(text = map["text"].toString(), name = map["name"].toString())
+                    messages.add(newMsg)
+                    // TODO: Scroll to bottom for every new message.
+                }
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e(TAG, "An exception occurred while reading data: ", databaseError.toException())
+            }
+        }
+        Log.e(TAG, "Message(s) from DB: $messages")
+        messageRef.addValueEventListener(valueEventListener)
         auth = Firebase.auth
         setContent {
             JetpackChatAppTheme {
@@ -62,6 +91,7 @@ class HomePageActivity : AppCompatActivity() {
             }
         }
     }
+    @SuppressLint("CoroutineCreationDuringComposition")
     @Composable
     fun HomePageScreen(){
         var newMessage : String by remember { mutableStateOf("") }
@@ -98,7 +128,15 @@ class HomePageActivity : AppCompatActivity() {
                     items = messages
                 ){
                     message -> MessageBubble(messageText = message)
-
+                    // TODO: If any other way to use coroutines to scroll to bottom on item update/added.
+                    // Scrolling to bottom using coroutine thread whenever a new message is received.
+                    // TODO: Use floatin button to show new messages instead of scrolling to bottom
+                    coroutineScope.launch {
+                        if(listState.layoutInfo.totalItemsCount != totalMessages){
+                            listState.animateScrollToItem(listState.layoutInfo.totalItemsCount - 1)
+                            totalMessages = listState.layoutInfo.totalItemsCount
+                        }
+                    }
                 }
             }
             Row(

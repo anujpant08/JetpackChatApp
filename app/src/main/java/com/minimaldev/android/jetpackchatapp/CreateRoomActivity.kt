@@ -106,8 +106,8 @@ class CreateRoomActivity : AppCompatActivity() {
                         val finalRoomName = "JetChat-${roomName.trim()}-$randomCode" // Creating a unique room name.
                         Log.e(TAG, "room name is: $finalRoomName")
                         //Adding new child node in the firebase realtime db tree structure for a new room, with a default message for every new room.
-                        db.reference.child("messages").child(roomName).push().setValue("This is the starting message of this room.")
-                        var intent = Intent(context, HomePageActivity::class.java)
+                        //db.reference.child("messages").child(roomName).push().setValue("This is the starting message of this room.")
+                        val intent = Intent(context, HomePageActivity::class.java)
                         intent.putExtra("roomName", roomName.trim())
                         context.startActivity(intent)
                     } else {
