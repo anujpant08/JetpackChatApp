@@ -151,7 +151,7 @@ class ResetPasswordActivity : AppCompatActivity() {
                                             "Password reset successful.",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                        baseContext.startActivity(Intent(baseContext, WelcomeJetpackActivity::class.java))
+                                        baseContext.startActivity(Intent(baseContext, WelcomeJetChatActivity::class.java))
                                     }else if(task.isCanceled){
                                         Toast.makeText(
                                             baseContext,
