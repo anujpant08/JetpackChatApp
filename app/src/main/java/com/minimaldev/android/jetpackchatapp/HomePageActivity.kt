@@ -1,37 +1,30 @@
 package com.minimaldev.android.jetpackchatapp
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CornerBasedShape
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -39,21 +32,18 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import com.minimaldev.android.jetpackchatapp.model.MessageText
 import com.minimaldev.android.jetpackchatapp.ui.theme.JetpackChatAppTheme
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.Instant.now
 import java.util.*
 import kotlin.collections.HashMap
 
 class HomePageActivity : AppCompatActivity() {
     var messages : SnapshotStateList<MessageText> = mutableStateListOf()
     private lateinit var auth: FirebaseAuth
-    lateinit var roomName : String
+    private lateinit var roomName : String
     val TAG : String = "HomePageActivity"
     private lateinit var db: FirebaseDatabase
     private var totalMessages = 0
@@ -75,7 +65,6 @@ class HomePageActivity : AppCompatActivity() {
                     Log.e(TAG, "map: $map")
                     val newMsg = MessageText(text = map["text"].toString(), name = map["name"].toString())
                     messages.add(newMsg)
-                    // TODO: Scroll to bottom for every new message.
                 }
             }
             override fun onCancelled(databaseError: DatabaseError) {
@@ -97,105 +86,145 @@ class HomePageActivity : AppCompatActivity() {
         var newMessage : String by remember { mutableStateOf("") }
         val listState = rememberLazyListState()
         val coroutineScope = rememberCoroutineScope()
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = colorResource(id = R.color.white))
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = Modifier.fillMaxSize(1f)
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .background(color = colorResource(id = R.color.purple_200_dark))
-                    .weight(0.3f, true)
-                    .padding(start = 16.dp),
-                verticalArrangement = Arrangement.Center,
-            ){
-                Text(
-                    text = roomName,
-                    fontSize = 20.sp,
-                    color = colorResource(id = R.color.white),
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .weight(2.3f, true),
-                contentPadding = PaddingValues(8.dp),
-                state = listState
-            ){
-                items(
-                    items = messages
-                ){
-                    message -> MessageBubble(messageText = message)
-                    // TODO: If any other way to use coroutines to scroll to bottom on item update/added.
-                    // Scrolling to bottom using coroutine thread whenever a new message is received.
-                    // TODO: Use floatin button to show new messages instead of scrolling to bottom
-                    coroutineScope.launch {
-                        if(listState.layoutInfo.totalItemsCount != totalMessages){
-                            listState.animateScrollToItem(listState.layoutInfo.totalItemsCount - 1)
-                            totalMessages = listState.layoutInfo.totalItemsCount
-                        }
-                    }
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .weight(0.4f, true),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .background(color = colorResource(id = R.color.white))
             ) {
-                BasicTextField(
-                    value = newMessage,
-                    onValueChange = { newMessage = it },
+                Column(
                     modifier = Modifier
-                        .background(
-                            color = colorResource(id = R.color.new_message_background),
-                            shape = RoundedCornerShape(14.dp)
-                        )
-                        .weight(1f, true)
-                        .height(40.dp)
-                        .padding(8.dp),
-                    textStyle = TextStyle(
-                        color = colorResource(id = R.color.black),
-                        fontSize = 16.sp
-                    ),
-                )
-                IconButton(onClick = {
-                    Log.e(TAG, "New message is: " + newMessage.trim())
-                    if(newMessage.trim() != ""){
-                        val messageText = MessageText(text = newMessage, name = auth.currentUser?.displayName.toString(), date = Date())
-                        db.reference.child("messages").child(roomName).push().setValue(messageText)
-                        messages.add(messageText)
-                        coroutineScope.launch {
-                            listState.animateScrollToItem(listState.layoutInfo.totalItemsCount - 1)
-                        }
-                        newMessage = ""
-                    }
-                }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.send),
-                        contentDescription = "Send",
-                        modifier = Modifier
-                            .size(32.dp)
-                            .weight(0.3f, true),
-                        tint = colorResource(id = R.color.purple_200_dark)
+                        .fillMaxWidth(1f)
+                        .background(color = colorResource(id = R.color.purple_200_dark))
+                        .weight(0.3f, true)
+                        .padding(start = 16.dp),
+                    verticalArrangement = Arrangement.Center,
+                ){
+                    Text(
+                        text = roomName,
+                        fontSize = 20.sp,
+                        color = colorResource(id = R.color.white),
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth(1f)
+                        .weight(2.4f, true),
+                    contentPadding = PaddingValues(8.dp),
+                    state = listState
+                ){
+                    items(
+                        items = messages
+                    ){
+                            message -> MessageBubble(messageText = message)
+                        // TODO: If any other way to use coroutines to scroll to bottom on item update/added.
+                        // Scrolling to bottom using coroutine thread whenever a new message is received.
+                        // TODO: Use floating button to show new messages instead of scrolling to bottom
+                        coroutineScope.launch {
+                            if(listState.layoutInfo.totalItemsCount != totalMessages){
+                                if(totalMessages == 0){
+                                    listState.animateScrollToItem(listState.layoutInfo.totalItemsCount - 1)
+                                }
+                                totalMessages = listState.layoutInfo.totalItemsCount
+                            }
+                        }
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .weight(0.3f, true),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    BasicTextField(
+                        value = newMessage,
+                        onValueChange = { newMessage = it },
+                        modifier = Modifier
+                            .background(
+                                color = colorResource(id = R.color.new_message_background),
+                                shape = RoundedCornerShape(14.dp)
+                            )
+                            .weight(1f, true)
+                            .height(40.dp)
+                            .padding(8.dp),
+                        textStyle = TextStyle(
+                            color = colorResource(id = R.color.black),
+                            fontSize = 16.sp
+                        ),
+                    )
+                    IconButton(onClick = {
+                        Log.e(TAG, "New message is: " + newMessage.trim())
+                        if(newMessage.trim() != ""){
+                            val messageText = MessageText(text = newMessage, name = auth.currentUser?.displayName.toString(), date = Date())
+                            db.reference.child("messages").child(roomName).push().setValue(messageText)
+                            messages.add(messageText)
+                            coroutineScope.launch {
+                                listState.animateScrollToItem(listState.layoutInfo.totalItemsCount - 1)
+                            }
+                            newMessage = ""
+                        }
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.send),
+                            contentDescription = "Send",
+                            modifier = Modifier
+                                .size(32.dp)
+                                .weight(0.3f, true),
+                            tint = colorResource(id = R.color.purple_200_dark)
+                        )
+                    }
+                }
+            }
+            val showButton by remember {
+                //Only show "Scroll to bottom" button when the total messages is > 10 and first visible item position < totalItems/2 and list is not scrolling.
+                derivedStateOf {
+                    listState.layoutInfo.totalItemsCount > 10 && listState.firstVisibleItemIndex < listState.layoutInfo.totalItemsCount/2
+                            && !listState.isScrollInProgress
+                }
+            }
+            AnimatedVisibility(
+                visible = showButton,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                ScrollToBottomButton(coroutineScope, listState)
             }
         }
     }
-    private fun createDummyMessages(){
-        var messageText1 = MessageText("Hi!", "Kevin", Date())
-        var messageText2 = MessageText("Hello!", "John", Date())
-        var messageText3 = MessageText("How are you ?", "Kevin", Date())
-        var messageText4 = MessageText("I am good, thanks!", "John", Date())
-        var messageText5 = MessageText("sdfhsifsiuhdfshufisfsfsydfsdusdufhshufsfhshufsuhfsfsuihfsfsdhfsdhfsiufsifshjfsduifsdfsfkhsfhisfyijhkfsihfsdfiusdf", "Amy", Date())
-        this.messages.add(messageText1)
-        this.messages.add(messageText2)
-        this.messages.add(messageText3)
-        this.messages.add(messageText4)
-        this.messages.add(messageText5)
+
+    @Composable
+    private fun ScrollToBottomButton(coroutineScope: CoroutineScope, listState: LazyListState) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(bottom = 100.dp)
+        ){
+            ExtendedFloatingActionButton(
+                text =
+                {
+                    Text(
+                        text = "Latest messages",
+                        fontSize = 14.sp,
+                        color = colorResource(id = R.color.purple_200_button))
+                },
+                onClick = {
+                    coroutineScope.launch {
+                        listState.animateScrollToItem(listState.layoutInfo.totalItemsCount - 1)
+                    }
+                },
+                backgroundColor = colorResource(id = R.color.new_message_background),
+                elevation = FloatingActionButtonDefaults.elevation(
+                    defaultElevation = 6.dp,
+                    focusedElevation = 0.dp,
+                    hoveredElevation = 0.dp,
+                    pressedElevation = 3.dp
+                ),
+                modifier = Modifier.height(30.dp)
+            )
+        }
     }
 }
