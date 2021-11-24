@@ -95,9 +95,7 @@ class WelcomeJetpackActivity  : AppCompatActivity(){
                     )
                     TextButton(
                         onClick = {
-                                  //Join existing room
-
-
+                            context.startActivity(Intent(context, JoinRoomActivity::class.java))
                         },
                         modifier = Modifier.padding(16.dp),
                         shape = RoundedCornerShape(20.dp),
@@ -119,7 +117,7 @@ class WelcomeJetpackActivity  : AppCompatActivity(){
                     )
                     TextButton(
                         onClick = {
-                                  context.startActivity(Intent(context, CreateRoomActivity::class.java))
+                            context.startActivity(Intent(context, CreateRoomActivity::class.java))
                         },
                         modifier = Modifier.padding(16.dp),
                         shape = RoundedCornerShape(20.dp),
