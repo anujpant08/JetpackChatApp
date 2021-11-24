@@ -94,7 +94,11 @@ class WelcomeJetpackActivity  : AppCompatActivity(){
                             .height(16.dp)
                     )
                     TextButton(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                                  //Join existing room
+
+
+                        },
                         modifier = Modifier.padding(16.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.textButtonColors(
