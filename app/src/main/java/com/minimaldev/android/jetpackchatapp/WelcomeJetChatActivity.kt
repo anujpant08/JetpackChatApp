@@ -38,7 +38,7 @@ import coil.size.Scale
 import coil.transform.CircleCropTransformation
 import com.minimaldev.android.jetpackchatapp.ui.theme.JetpackChatAppTheme
 
-class WelcomeJetpackActivity  : AppCompatActivity(){
+class WelcomeJetChatActivity  : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -82,7 +82,7 @@ class WelcomeJetpackActivity  : AppCompatActivity(){
                             .height(150.dp)
                     )
                     Text(
-                        text = "Welcome to Jetpack!",
+                        text = "Welcome to JetChat!",
                         color = colorResource(id = R.color.white),
                         fontWeight = FontWeight.Bold,
                         fontSize = 32.sp,

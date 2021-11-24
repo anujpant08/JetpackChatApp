@@ -22,7 +22,7 @@
             android:name=".ResetPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".WelcomeJetpackActivity"
+            android:name=".WelcomeJetChatActivity"
             android:exported="false" />
         <activity
             android:name=".VerifyCodeActivity"

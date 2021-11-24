@@ -67,7 +67,7 @@ class LoginActivity : ComponentActivity() {
         val currentUser = auth.currentUser
         if (currentUser != null) {
             //Show homepage.
-            context.startActivity(Intent(context, WelcomeJetpackActivity::class.java))
+            context.startActivity(Intent(context, WelcomeJetChatActivity::class.java))
         } else {
             setContent {
                 JetpackChatAppTheme {
@@ -229,7 +229,7 @@ private fun signIn(email: String, password: String) {
             if (task.isSuccessful) {
                 val user = auth.currentUser
                 Log.e(TAG, "signInWithEmail:success user-> " + user)
-                context.startActivity(Intent(context, WelcomeJetpackActivity::class.java))
+                context.startActivity(Intent(context, WelcomeJetChatActivity::class.java))
             } else {
                 Log.e(TAG, "signInWithEmail:failure", task.exception)
                 Toast.makeText(
