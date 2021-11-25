@@ -1,6 +1,7 @@
 package com.minimaldev.android.jetpackchatapp
 
 import android.annotation.SuppressLint
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -47,6 +48,7 @@ class HomePageActivity : AppCompatActivity() {
     val TAG : String = "HomePageActivity"
     private lateinit var db: FirebaseDatabase
     private var totalMessages = 0
+    lateinit var mediaPlayer : MediaPlayer
     /*fun HomePageActivity(messages : MutableList<MessageText>){
         this.messages = messages
     }*/
@@ -54,6 +56,7 @@ class HomePageActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         roomName = intent.getStringExtra("roomName").toString()
         db = Firebase.database
+        mediaPlayer = MediaPlayer.create(this, R.raw.received)
         //createDummyMessages()
         val messageRef = db.reference.child("messages").child(roomName)
         val valueEventListener = object : ValueEventListener{
@@ -128,6 +131,9 @@ class HomePageActivity : AppCompatActivity() {
                             if(listState.layoutInfo.totalItemsCount != totalMessages){
                                 if(totalMessages == 0 || listState.firstVisibleItemIndex > listState.layoutInfo.totalItemsCount/2){
                                     listState.animateScrollToItem(listState.layoutInfo.totalItemsCount - 1)
+                                    if(totalMessages != 0){
+                                        mediaPlayer.start()
+                                    }
                                 }
                                 totalMessages = listState.layoutInfo.totalItemsCount
                             }
@@ -227,5 +233,9 @@ class HomePageActivity : AppCompatActivity() {
                 modifier = Modifier.height(30.dp)
             )
         }
+    }
+    override fun onDestroy() {
+        mediaPlayer.release() // Releasing resources for preventing memory leak.
+        super.onDestroy()
     }
 }
