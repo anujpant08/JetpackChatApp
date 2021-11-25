@@ -1,6 +1,6 @@
 # JetpackChatApp
 
-![JetChat App](https://drive.google.com/file/d/1hpoY3mVaZitY3njHYtyz7ZcQIoqhujzW/view?usp=sharing)
+![JetChat App](https://ibb.co/dp9Vkw9)
 
 ## Introduction
 
