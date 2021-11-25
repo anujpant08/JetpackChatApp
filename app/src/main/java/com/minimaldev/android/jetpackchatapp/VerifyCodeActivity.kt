@@ -13,6 +13,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -31,7 +32,7 @@ class VerifyCodeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         verifyCode = intent.getStringExtra("verifyCode").toString()
         emailId = intent.getStringExtra("emailId").toString()
-        Log.e(TAG, "verify code is:  " + verifyCode)
+        Log.e(TAG, "verify code is:  $verifyCode")
         setContent {
             JetpackChatAppTheme {
                 SetVerifyScreen()
@@ -41,6 +42,7 @@ class VerifyCodeActivity : AppCompatActivity() {
     @Composable
     fun SetVerifyScreen(){
         var code : String by remember { mutableStateOf("") }
+        val context = LocalContext.current
         Column (
             modifier = Modifier
                 .fillMaxSize()
@@ -100,7 +102,7 @@ class VerifyCodeActivity : AppCompatActivity() {
                         verifyCode(code)
                     } else {
                         Toast.makeText(
-                            LoginActivity.context,
+                            context,
                             "Please enter a valid code.",
                             Toast.LENGTH_SHORT
                         ).show()
@@ -122,16 +124,16 @@ class VerifyCodeActivity : AppCompatActivity() {
     }
     private fun verifyCode(code : String){
         if(code == verifyCode){
-            //Go to homepage and login is successful
+            //Go to reset password activity and login is successful
             Toast.makeText(
                 this,
                 "Verification successful.",
                 Toast.LENGTH_SHORT
             ).show()
-            // TODO: For testing purpose:
-            val intent: Intent = Intent(this, ResetPasswordActivity::class.java)
+            val intent = Intent(this, ResetPasswordActivity::class.java)
             intent.putExtra("emailId", emailId)
             this.startActivity(intent)
+            finish()
         }else{
             Toast.makeText(
                 this,

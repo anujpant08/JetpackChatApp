@@ -66,17 +66,17 @@ class SendMail() : Authenticator(), TransportListener, ConnectionListener{
 
     override fun messageDelivered(e: TransportEvent?) {
         Log.e(TAG,"Message delivered.")
-        LoginActivity.updateUI(true, "Delivered", this.toAddress, this.code)
+        LoginActivity.updateUI(true, "Delivered", this.toAddress, this.code, context)
     }
 
     override fun messageNotDelivered(e: TransportEvent?) {
         Log.e(TAG,"Message NOT delivered.")
-        LoginActivity.updateUI(false, "Not Delivered", this.toAddress, this.code)
+        LoginActivity.updateUI(false, "Not Delivered", this.toAddress, this.code, context)
     }
 
     override fun messagePartiallyDelivered(e: TransportEvent?) {
         Log.e(TAG,"Message PARTIALLY delivered.")
-        LoginActivity.updateUI(false, "Partially Delivered", this.toAddress, this.code)
+        LoginActivity.updateUI(false, "Partially Delivered", this.toAddress, this.code, context)
     }
 
     override fun opened(e: ConnectionEvent?) {

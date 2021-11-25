@@ -26,7 +26,6 @@ import com.google.firebase.ktx.Firebase
 import com.minimaldev.android.jetpackchatapp.ui.theme.JetpackChatAppTheme
 
 class ResetPasswordActivity : AppCompatActivity() {
-    private val user = Firebase.auth.currentUser!!
     private var emailId : String = ""
     private val TAG : String = "ResetPasswordActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,29 +120,11 @@ class ResetPasswordActivity : AppCompatActivity() {
             Button(
                 onClick = {
                     if (password == confirmPassword && password.trim() != "") {
-                        //Re-authenticate user if currentUser is null
-                        if (user != null) {
-                            //User is signed in and update password normally.
-                            user.updatePassword(password).addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    Toast.makeText(
-                                        baseContext,
-                                        "Password reset successful.",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }else if(task.isCanceled){
-                                    Toast.makeText(
-                                        baseContext,
-                                        "Error while resetting password. Please try again.",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                        } else {
-                            //Re-authenticate user to reset password.
-                            val credential = EmailAuthProvider.getCredential(emailId, password)
-                            user.reauthenticate(credential).addOnSuccessListener {
-                                Log.e(TAG, "User re-authenticated.")
+                        try{
+                            //Re-authenticate user if currentUser is null
+                            val user = Firebase.auth.currentUser!!
+                            if (user != null) {
+                                //User is signed in and update password normally.
                                 user.updatePassword(password).addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
                                         Toast.makeText(
@@ -151,8 +132,7 @@ class ResetPasswordActivity : AppCompatActivity() {
                                             "Password reset successful.",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                        baseContext.startActivity(Intent(baseContext, WelcomeJetChatActivity::class.java))
-                                    }else if(task.isCanceled){
+                                    } else if (task.isCanceled) {
                                         Toast.makeText(
                                             baseContext,
                                             "Error while resetting password. Please try again.",
@@ -160,11 +140,40 @@ class ResetPasswordActivity : AppCompatActivity() {
                                         ).show()
                                     }
                                 }
-                            }.addOnFailureListener {
-                                Log.e(TAG, "User re-authentication failed." + it)
-                            }.addOnCanceledListener {
-                                Log.e(TAG, "User re-authentication cancelled.")
+                            } else {
+                                //Re-authenticate user to reset password.
+                                val credential = EmailAuthProvider.getCredential(emailId, password)
+                                user.reauthenticate(credential).addOnSuccessListener {
+                                    Log.e(TAG, "User re-authenticated.")
+                                    user.updatePassword(password).addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            Toast.makeText(
+                                                baseContext,
+                                                "Password reset successful.",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            baseContext.startActivity(
+                                                Intent(
+                                                    baseContext,
+                                                    WelcomeJetChatActivity::class.java
+                                                )
+                                            )
+                                        } else if (task.isCanceled) {
+                                            Toast.makeText(
+                                                baseContext,
+                                                "Error while resetting password. Please try again.",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
+                                }.addOnFailureListener {
+                                    Log.e(TAG, "User re-authentication failed." + it)
+                                }.addOnCanceledListener {
+                                    Log.e(TAG, "User re-authentication cancelled.")
+                                }
                             }
+                        }catch(e : Exception){
+                            Log.e(TAG, "An exception has occurred.", e)
                         }
                     } else if (password != confirmPassword) {
                         Toast.makeText(
