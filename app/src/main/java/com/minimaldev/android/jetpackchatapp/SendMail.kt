@@ -26,7 +26,7 @@ class SendMail() : Authenticator(), TransportListener, ConnectionListener{
     private lateinit var code : String
     private lateinit var context: Context
     private var toAddress : String = ""
-    private val fromAddress = "minimaldev4playstore@gmail.com"
+    private val fromAddress = ""
     suspend fun send(toAddress : String, code : String, context : Context) {
         this.context = context
         this.toAddress = toAddress
@@ -61,7 +61,7 @@ class SendMail() : Authenticator(), TransportListener, ConnectionListener{
         Log.e(TAG, "Sending mail to: " + toAddress)
     }
     override fun getPasswordAuthentication(): PasswordAuthentication {
-        return PasswordAuthentication(fromAddress, "chelsea997")
+        return PasswordAuthentication(fromAddress, "")
     }
 
     override fun messageDelivered(e: TransportEvent?) {
